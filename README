@@ -1,0 +1,3 @@
+A very rough sketch of a psycopg2-based postgres provider for pync.
+
+Don't even think about using this in production.
