@@ -1,3 +1,54 @@
-A very rough sketch of a psycopg2-based postgres provider for pync.
+pgpqync is a provider for pynq that gives access to postgresql
+databases via psycopg2.
 
-Don't even think about using this in production.
+After imports something like this:
+
+>>> from pynq import From
+>>> from pgpynq import table
+
+You might do something like this:
+
+>>> users = From(table("users")).where("id == 1").select("username")
+>>> print users[0].name
+'Amy'
+
+or this:
+
+>>> users = From(table("users")).where("age > 150").select_many()
+>>> print users[0].name
+'Professor'
+>>> print users[0].fullname
+'Professor Hubert J. Farnsworth'
+
+This will probably change soon, but for now you can accomplish simple
+joins like so:
+
+>>> from pgpynq import join
+>>> users_with_posts = From(join("users AS u",
+...                              "posts AS p",
+...                              "p.user_id = u.id")).select_many()
+>>> users_with_posts[0].fullname
+'Professor Hubert J. Farnsworth!'
+>>> users_with_posts[0].title
+'Good news, everyone!'
+
+
+These examples get a default connection from an implicitly created
+connection pool.
+
+If you wanted to pass in a connection, you could do it like so:
+>>> c = find_or_create_a_connection_however_you_like()
+>>> users = From(Table("users", connection=c)).select_many()
+
+If you don't want to pass in a connection to each query you can
+configure a default connection by creating a config file.  pgpynq will
+first look for an environment variable called CONFIG_FILE_ENV_VAR.  If
+this variable exists in the environment then the value of the variable
+will be treated as the name of the file to use as a config file.  If
+this variable does not exist then it the filename will default to
+"pgpynq.cfg" in the current working directory at the time pgpynq is
+imported.  pgpynq will default to using the PersistentConnectionPool
+with the connection string defined in this file.  The file is
+processed with ConfigParser so should be in the standard .ini format
+with a single section called "connection" with a single value called
+"connection_string".
