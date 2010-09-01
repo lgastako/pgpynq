@@ -1,6 +1,13 @@
 pgpqync is a provider for pynq that gives access to postgresql
 databases via psycopg2.
 
+You can learn more about pynq here:
+http://github.com/heynemann/pynq
+
+
+Basic Usage:
+
+
 After imports something like this:
 
 >>> from pynq import From
